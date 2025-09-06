@@ -4,6 +4,7 @@
   "description": "A beautiful Bible quotes screensaver application",
   "main": "index.html",
   "scripts": {
+    "build": "node build.js",
     "start": "npx http-server . -p 3000",
     "dev": "npx http-server . -p 3000 -o"
   },
