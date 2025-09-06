@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bible Quotes Screensaver</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Source+Sans+Pro:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.css" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/styles.css') }}" rel="stylesheet">
+</head>
+<body>
+    <div class="container-fluid h-100">
+        <div class="countdown-timer">
+            <div class="progress-ring">
+                <svg width="60" height="60" viewBox="0 0 60 60">
+                    <circle class="progress-ring__circle-bg" r="26" cx="30" cy="30" />
+                    <circle class="progress-ring__circle" r="26" cx="30" cy="30" />
+                </svg>
+                <span class="countdown-text">30</span>
+            </div>
+        </div>
+        <div class="quote-container">
+            <div class="quote-card">
+                <p class="quote-text"></p>
+                <p class="quote-reference"></p>
+                <button class="favorite-btn control-btn">
+                    <i data-feather="heart"></i>
+                </button>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button id="playPauseBtn" class="control-btn">
+                <i data-feather="pause"></i>
+            </button>
+            <button id="settingsBtn" class="control-btn">
+                <i data-feather="settings"></i>
+            </button>
+        </div>
+
+        <div class="settings-panel" id="settingsPanel">
+            <div class="settings-header">
+                <h3>Settings</h3>
+                <button class="close-settings-btn control-btn">
+                    <i data-feather="x"></i>
+                </button>
+            </div>
+            <div class="setting-item">
+                <label for="intervalRange">Interval (seconds)</label>
+                <input type="range" class="form-range" id="intervalRange" min="5" max="60" step="5" value="30">
+                <span id="intervalValue">30</span>s
+            </div>
+            <div class="setting-item">
+                <label for="shuffleToggle">Shuffle Quotes</label>
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="shuffleToggle">
+                    <label class="form-check-label" for="shuffleToggle">Enable Shuffle</label>
+                </div>
+            </div>
+            <div class="setting-item">
+                <label for="themeToggle">Theme</label>
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="themeToggle">
+                    <label class="form-check-label" for="themeToggle">Dark Mode</label>
+                </div>
+            </div>
+            <div class="setting-item">
+                <label for="backgroundSelect">Background</label>
+                <select class="form-select" id="backgroundSelect">
+                    <option value="gradient">Purple Gradient</option>
+                    <option value="sunset">Sunset Harmony</option>
+                    <option value="ocean">Ocean Breeze</option>
+                    <option value="forest">Forest Mist</option>
+                    <option value="mountain-dawn">Mountain Dawn</option>
+                    <option value="desert-dusk">Desert Dusk</option>
+                    <option value="northern-lights">Northern Lights</option>
+                    <option value="spring-bloom">Spring Bloom</option>
+                    <option value="midnight-jazz">Midnight Jazz</option>
+                    <option value="golden-hour">Golden Hour</option>
+                    <option value="midnight-frost">Midnight Frost</option>
+                    <option value="urban-shadow">Urban Shadow</option>
+                    <option value="pearl-dawn">Pearl Dawn</option>
+                    <option value="cotton-cloud">Cotton Cloud</option>
+                </select>
+            </div>
+            <div class="setting-item">
+                <label>Favorites <span id="favoritesCount">0</span></label>
+                <div id="favoritesList" class="favorites-list">
+                    <!-- Favorites will be dynamically populated here -->
+                </div>
+                <button id="clearFavoritesBtn" class="control-btn clear-favorites-btn">
+                    <i data-feather="trash-2"></i>
+                    <span>Clear All</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Inject quotes data from Flask
+        const BIBLE_QUOTES = {{ quotes|tojson|safe }};
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>

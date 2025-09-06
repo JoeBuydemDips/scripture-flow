@@ -1,0 +1,24 @@
+{
+  "name": "scripture-flow",
+  "version": "1.0.0",
+  "description": "A beautiful Bible quotes screensaver application",
+  "main": "index.html",
+  "scripts": {
+    "build": "node build.js",
+    "start": "npx http-server . -p 3000",
+    "dev": "npx http-server . -p 3000 -o"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "http-server": "^14.1.1"
+  },
+  "keywords": [
+    "bible",
+    "quotes",
+    "screensaver",
+    "inspirational",
+    "netlify"
+  ],
+  "author": "Scripture Flow",
+  "license": "MIT"
+}

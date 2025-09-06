@@ -1,0 +1,735 @@
+:root {
+    --primary-color: #2c3e50;
+    --background-color: #f5f6fa;
+    --text-color: #2c3e50;
+    --card-background: #ffffff;
+    --shadow-color: rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="dark"] {
+    --primary-color: #e0e0e0;
+    --background-color: #1a1a1a;
+    --text-color: #ffffff;
+    --card-background: #2c2c2c;
+    --shadow-color: rgba(255, 255, 255, 0.05);
+}
+
+[data-theme="dark"] .quote-text,
+[data-theme="dark"] .quote-reference,
+[data-theme="dark"] .settings-panel,
+[data-theme="dark"] .setting-item,
+[data-theme="dark"] .form-check-label,
+[data-theme="dark"] .settings-header h3 {
+    color: var(--text-color);
+}
+
+[data-theme="dark"] .form-select {
+    background-color: #3a3a3a;
+    color: var(--text-color);
+    border-color: #4a4a4a;
+}
+
+[data-theme="dark"] .form-range {
+    background-color: transparent;
+}
+
+[data-theme="dark"] .form-range::-webkit-slider-thumb {
+    background-color: var(--text-color);
+}
+
+[data-theme="dark"] .form-range::-webkit-slider-runnable-track {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+[data-theme="dark"] .form-select option {
+    background-color: #3a3a3a;
+    color: var(--text-color);
+}
+
+[data-theme="dark"] .control-btn svg,
+[data-theme="dark"] .favorite-btn svg,
+[data-theme="dark"] .settings-panel svg {
+    stroke: white;
+    color: white;
+}
+
+[data-theme="dark"] .favorite-btn.active svg {
+    stroke: white;
+    color: white;
+    fill: white;
+}
+
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+.countdown-timer {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 100;
+}
+
+.progress-ring {
+    position: relative;
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+    backface-visibility: hidden;
+}
+
+@media (max-width: 768px) {
+    .countdown-timer {
+        top: 10px;
+        right: 10px;
+    }
+    
+    .progress-ring {
+        width: 50px;
+        height: 50px;
+    }
+    
+    .countdown-text {
+        font-size: 1rem;
+    }
+}
+
+.progress-ring svg {
+    position: absolute;
+    transform: rotate(-90deg);
+    -webkit-transform: rotate(-90deg);
+    transform-origin: center;
+    -webkit-transform-origin: center;
+}
+
+.progress-ring__circle-bg,
+.progress-ring__circle {
+    fill: none;
+    stroke-width: 4;
+    r: 26;
+    cx: 30;
+    cy: 30;
+}
+
+.progress-ring__circle-bg {
+    stroke: var(--shadow-color);
+}
+
+.progress-ring__circle {
+    stroke: var(--text-color);
+    stroke-linecap: round;
+    stroke-dasharray: 163.36;
+    stroke-dashoffset: 163.36;
+    transition: stroke-dashoffset 0.1s linear;
+}
+
+.countdown-text {
+    position: relative;
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: var(--text-color);
+    transition: color 0.3s ease;
+    font-family: 'Source Sans Pro', sans-serif;
+}
+
+body[data-background="gradient"] {
+    background: linear-gradient(45deg, #614385, #516395);
+    background-size: 200% 200%;
+    animation: gradient 15s ease infinite;
+}
+
+body[data-background="sunset"] {
+    background: linear-gradient(to right bottom, #ff512f, #dd2476, #f09819);
+    background-size: 400% 400%;
+    animation: gradient 20s ease infinite;
+}
+
+body[data-background="ocean"] {
+    background: linear-gradient(to right, #2c3e50, #3498db, #2980b9);
+    background-size: 200% 200%;
+    animation: gradient 15s ease infinite;
+}
+
+body[data-background="forest"] {
+    background: linear-gradient(45deg, #134E5E, #71B280);
+    background-size: 200% 200%;
+    animation: gradient 15s ease infinite;
+}
+
+body[data-background="mountain-dawn"] {
+    background: linear-gradient(to right bottom, #5f2c82, #ff6b6b);
+    background-size: 300% 300%;
+    animation: gradient 18s ease infinite;
+}
+
+body[data-background="desert-dusk"] {
+    background: linear-gradient(45deg, #c79081, #dfa579);
+    background-size: 200% 200%;
+    animation: gradient 15s ease infinite;
+}
+
+body[data-background="northern-lights"] {
+    background: linear-gradient(to right, #1D976C, #93F9B9, #2C3E50);
+    background-size: 300% 300%;
+    animation: gradient 20s ease infinite;
+}
+
+body[data-background="spring-bloom"] {
+    background: linear-gradient(to right bottom, #fd746c, #ff9068, #ffd080);
+    background-size: 300% 300%;
+    animation: gradient 18s ease infinite;
+}
+
+body[data-background="midnight-jazz"] {
+    background: linear-gradient(45deg, #0F2027, #203A43, #2C5364);
+    background-size: 200% 200%;
+    animation: gradient 15s ease infinite;
+}
+
+body[data-background="golden-hour"] {
+    background: linear-gradient(to right, #DAA520, #FFD700, #FFA500);
+    background-size: 300% 300%;
+    animation: gradient 20s ease infinite;
+}
+
+body[data-background="midnight-frost"] {
+    background: linear-gradient(45deg, #1C1C1C, #2C3E50);
+    background-size: 200% 200%;
+    animation: gradient 15s ease infinite;
+}
+
+body[data-background="urban-shadow"] {
+    background: linear-gradient(to right, #363636, #696969);
+    background-size: 200% 200%;
+    animation: gradient 15s ease infinite;
+}
+
+body[data-background="pearl-dawn"] {
+    background: linear-gradient(45deg, #FFFFFF, #F5F5F5, #FFF5E6);
+    background-size: 300% 300%;
+    animation: gradient 20s ease infinite;
+}
+
+body[data-background="cotton-cloud"] {
+    background: linear-gradient(to right, #FFFFFF, #FAFAFA, #F8F8F8);
+    background-size: 200% 200%;
+    animation: gradient 15s ease infinite;
+}
+
+@keyframes gradient {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+.quote-container {
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.quote-card {
+    background-color: var(--card-background);
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px var(--shadow-color);
+    max-width: 800px;
+    width: 90%;
+    text-align: center;
+    transition: all 0.3s ease-in-out;
+    position: relative;
+    cursor: pointer;
+    touch-action: pan-y pinch-zoom;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.quote-card:active {
+    transform: scale(0.98);
+}
+
+/* Enhanced swipe animations and feedback */
+.quote-card.swiping {
+    transition: transform 0.1s ease-out, opacity 0.1s ease-out;
+}
+
+.quote-card.swipe-left {
+    transform: translateX(-50px) rotate(-5deg) scale(0.95);
+    opacity: 0.7;
+    transition: transform 0.15s ease-out, opacity 0.15s ease-out;
+}
+
+.quote-card.swipe-right {
+    transform: translateX(50px) rotate(5deg) scale(0.95);
+    opacity: 0.7;
+    transition: transform 0.15s ease-out, opacity 0.15s ease-out;
+}
+
+/* Mobile-specific touch improvements */
+@media (max-width: 768px) {
+    .quote-card {
+        padding: 1.5rem;
+        margin: 10px;
+        min-height: 200px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        /* Improve touch response */
+        -webkit-tap-highlight-color: transparent;
+        -webkit-touch-callout: none;
+        -webkit-user-select: none;
+        user-select: none;
+    }
+    
+    .quote-text {
+        font-size: 1.4rem;
+        line-height: 1.5;
+    }
+    
+    .quote-reference {
+        font-size: 1rem;
+        margin-top: 1rem;
+    }
+    
+    /* Larger touch targets for mobile */
+    .control-btn {
+        width: 60px;
+        height: 60px;
+        font-size: 1.2rem;
+    }
+    
+    .favorite-btn {
+        width: 54px;
+        height: 54px;
+        bottom: 15px;
+        right: 15px;
+    }
+    
+    /* Better positioning for mobile controls */
+    .controls {
+        bottom: 30px;
+        right: 30px;
+        gap: 15px;
+    }
+    
+    .countdown-timer {
+        top: 20px;
+        right: 20px;
+    }
+}
+
+/* iPad and tablet improvements */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .quote-card {
+        max-width: 700px;
+        padding: 2.5rem;
+        /* Better touch handling on iPad */
+        -webkit-tap-highlight-color: transparent;
+        -webkit-touch-callout: none;
+    }
+    
+    .quote-text {
+        font-size: 1.6rem;
+    }
+    
+    /* Larger touch targets for iPad */
+    .control-btn {
+        width: 55px;
+        height: 55px;
+    }
+    
+    .favorite-btn {
+        width: 50px;
+        height: 50px;
+    }
+    
+    /* Settings panel optimization for tablet */
+    .settings-panel {
+        width: 350px;
+    }
+}
+
+.quote-text {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.8rem;
+    margin-bottom: 1rem;
+    line-height: 1.4;
+    transition: opacity 0.5s ease;
+    opacity: 1;
+}
+
+.quote-reference {
+    font-size: 1.2rem;
+    color: var(--primary-color);
+    font-style: italic;
+    transition: opacity 0.5s ease;
+    opacity: 1;
+}
+
+/* Mobile instructions tooltip */
+.mobile-instructions {
+    position: absolute;
+    top: -50px;
+    left: 50%;
+    transform: translateX(-50%);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.instruction-tooltip {
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    white-space: nowrap;
+    backdrop-filter: blur(10px);
+}
+
+/* Show instructions on mobile for first-time users */
+@media (max-width: 768px) {
+    .quote-card.show-instructions .mobile-instructions {
+        opacity: 1;
+        transform: translateX(-50%) translateY(-10px);
+    }
+}
+.swipe-indicators {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    transform: translateY(-50%);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.swipe-hint {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 20px;
+    font-size: 0.8rem;
+    color: var(--text-color);
+    backdrop-filter: blur(10px);
+}
+
+.swipe-hint-left {
+    left: 10px;
+}
+
+.swipe-hint-right {
+    right: 10px;
+}
+
+.swipe-hint i {
+    width: 16px;
+    height: 16px;
+}
+
+/* Show swipe hints on first load (mobile only) */
+@media (max-width: 768px) {
+    .quote-card:hover .swipe-indicators,
+    .quote-card.show-hints .swipe-indicators {
+        opacity: 1;
+    }
+    
+    /* Auto-hide after first interaction */
+    .quote-card.swipe-used .swipe-indicators {
+        display: none;
+    }
+}
+
+.quote-text.fade-out,
+.quote-reference.fade-out {
+    opacity: 0;
+}
+
+.controls {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    display: flex;
+    gap: 10px;
+}
+
+.control-btn {
+    background: var(--card-background);
+    border: none;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 2px 4px var(--shadow-color);
+    transition: transform 0.2s ease;
+}
+
+.control-btn:hover {
+    transform: scale(1.1);
+}
+
+.favorite-btn {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    width: 40px;
+    height: 40px;
+    background: var(--card-background);
+    border: none;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 2px 4px var(--shadow-color);
+    transition: transform 0.2s ease;
+}
+
+.favorite-btn:hover {
+    transform: scale(1.1);
+}
+
+.favorite-btn i {
+    width: 28px;
+    height: 28px;
+    stroke-width: 1.5;
+    color: var(--text-color);
+}
+
+.favorite-btn.active {
+    background-color: #ff4d4d;
+}
+
+.favorite-btn.active i {
+    color: white;
+    fill: white;
+    stroke: white;
+}
+
+@media (max-width: 768px) {
+    .favorite-btn {
+        width: 48px;
+        height: 48px;
+    }
+
+    .favorite-btn i {
+        width: 32px;
+        height: 32px;
+    }
+}
+
+.clear-favorites-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: auto;
+    height: 36px;
+    border-radius: 18px;
+    padding: 0 16px;
+    margin-top: 12px;
+    background-color: var(--card-background);
+    color: var(--text-color);
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+}
+
+.clear-favorites-btn:hover {
+    background-color: #ff4d4d;
+    color: white;
+    transform: scale(1.02);
+}
+
+.clear-favorites-btn i {
+    width: 16px;
+    height: 16px;
+}
+
+.favorites-empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1rem;
+    color: var(--primary-color);
+    text-align: center;
+}
+
+.favorites-empty-state i {
+    width: 32px;
+    height: 32px;
+    stroke-width: 1.5;
+    margin-bottom: 0.5rem;
+    opacity: 0.6;
+}
+
+.favorites-empty-state p {
+    margin: 0.5rem 0;
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.favorites-empty-state span {
+    font-size: 0.875rem;
+    opacity: 0.7;
+}
+
+.fade-enter {
+    opacity: 0;
+}
+
+.fade-enter-active {
+    opacity: 1;
+    transition: opacity 0.5s ease-in;
+}
+
+.fade-exit {
+    opacity: 1;
+}
+
+.fade-exit-active {
+    opacity: 0;
+    transition: opacity 0.5s ease-out;
+}
+
+.settings-panel {
+    position: fixed;
+    right: -300px;
+    top: 0;
+    width: 300px;
+    height: 100%;
+    background-color: var(--card-background);
+    padding: 2rem;
+    box-shadow: -2px 0 5px var(--shadow-color);
+    transition: right 0.3s ease;
+    overflow-y: auto;
+    z-index: 1000;
+}
+
+.settings-panel.active {
+    right: 0;
+}
+
+.settings-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.settings-header h3 {
+    margin: 0;
+}
+
+/* Mobile settings panel improvements */
+@media (max-width: 768px) {
+    .settings-panel {
+        width: 100%;
+        right: -100%;
+        padding: 1.5rem;
+        font-size: 0.9rem;
+    }
+    
+    .settings-panel.active {
+        right: 0;
+    }
+    
+    .close-settings-btn {
+        display: flex;
+        width: 40px;
+        height: 40px;
+    }
+    
+    .setting-item {
+        margin-bottom: 1.2rem;
+    }
+    
+    .favorites-list {
+        max-height: 150px;
+        font-size: 0.85rem;
+    }
+    
+    /* Improve form controls on mobile */
+    .form-range {
+        height: 8px;
+    }
+    
+    .form-range::-webkit-slider-thumb {
+        width: 20px;
+        height: 20px;
+    }
+    
+    .form-check-input {
+        width: 1.2em;
+        height: 1.2em;
+    }
+    
+    .form-select {
+        padding: 0.5rem;
+        font-size: 0.9rem;
+    }
+}
+
+.setting-item {
+    margin-bottom: 1.5rem;
+}
+
+
+.favorites-list {
+    max-height: 200px;
+    overflow-y: auto;
+    border: 1px solid var(--primary-color);
+    border-radius: 5px;
+    padding: 0;
+    margin: 10px 0;
+    background-color: var(--card-background);
+}
+
+.favorite-item {
+    padding: 10px 15px;
+    border-bottom: 1px solid var(--primary-color);
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    font-size: 0.9rem;
+    color: var(--text-color);
+}
+
+.favorite-item:last-child {
+    border-bottom: none;
+}
+
+.favorite-item:hover {
+    background-color: var(--shadow-color);
+}
+
+/* Style for favorites count */
+#favoritesCount {
+    display: inline-block;
+    min-width: 20px;
+    height: 20px;
+    line-height: 20px;
+    text-align: center;
+    background-color: var(--primary-color);
+    color: var(--card-background);
+    border-radius: 10px;
+    font-size: 0.8rem;
+    padding: 0 6px;
+    margin-left: 4px;
+}
