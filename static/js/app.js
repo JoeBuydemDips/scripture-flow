@@ -1,7 +1,10 @@
 class BibleQuoteDisplay {
     constructor() {
         // Get quotes from the global BIBLE_QUOTES variable loaded from quotes.js
-        this.quotes = window.BIBLE_QUOTES || BIBLE_QUOTES;
+        this.quotes = (window.BIBLE_QUOTES && window.BIBLE_QUOTES.length > 0) 
+            ? window.BIBLE_QUOTES 
+            : [{ text: "For God so loved the world, that he gave his only Son, that whoever believes in him should not perish but have eternal life.", reference: "John 3:16" }];
+        
         this.shuffledQuotes = [...this.quotes];
         this.currentIndex = 0;
         this.interval = null;
@@ -38,6 +41,15 @@ class BibleQuoteDisplay {
         this.lastTap = 0; // For double-tap detection
 
         // Initialize Feather icons first
+        if (typeof feather === 'undefined') {
+            console.error("Feather icons script did not load.");
+            // Optionally, hide elements that rely on Feather icons
+            document.querySelectorAll('.control-btn, .favorite-btn').forEach(btn => btn.style.display = 'none');
+            // Display an error message to the user
+            this.quoteText.textContent = "Error: Icons could not be loaded. Please check your internet connection.";
+            this.quoteReference.textContent = "";
+            return; // Stop initialization
+        }
         feather.replace({
             'stroke-width': 2,
             'width': 24,
@@ -502,6 +514,11 @@ class BibleQuoteDisplay {
     }
 
     displayQuote() {
+        if (!this.shuffledQuotes || this.shuffledQuotes.length === 0) {
+            this.quoteText.textContent = "No quotes available. Please check the quotes data source.";
+            this.quoteReference.textContent = "";
+            return;
+        }
         const quote = this.shuffledQuotes[this.currentIndex];
 
         // Fade out current quote
@@ -635,12 +652,14 @@ class BibleQuoteDisplay {
 // Initialize the application when the DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
     // Initialize Feather icons with specific settings
-    feather.replace({
-        'stroke-width': 2,
-        'width': 24,
-        'height': 24,
-        'color': 'currentColor'
-    });
+    if (typeof feather !== 'undefined') {
+        feather.replace({
+            'stroke-width': 2,
+            'width': 24,
+            'height': 24,
+            'color': 'currentColor'
+        });
+    }
     // Then create the Bible quote display instance
     const app = new BibleQuoteDisplay();
 });
