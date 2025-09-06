@@ -102,7 +102,6 @@ npm run dev
 
 - `npm run dev` - Start local server with auto-open
 - `npm start` - Start local server
-- `npm test` - Run security and build validation
 
 ## 📖 About the Verses
 
