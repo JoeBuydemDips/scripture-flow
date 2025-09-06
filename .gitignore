@@ -164,6 +164,7 @@ replit.nix
 
 # Generated files
 generated-icon.png
+.deployment-info.json
 
 # Old Flask files (keeping for reference but excluded from deployment)
 app.py

@@ -51,13 +51,108 @@ class BibleQuoteDisplay {
         this.showSwipeHintsIfNeeded();
     }
 
+    // Utility function to safely create DOM elements with text content
+    createSecureElement(tagName, textContent = '', className = '') {
+        const element = document.createElement(tagName);
+        if (textContent) {
+            element.textContent = textContent; // Safe - prevents XSS
+        }
+        if (className) {
+            element.className = className;
+        }
+        return element;
+    }
+
+    // Utility function to safely parse and validate localStorage data
+    safeGetFromStorage(key, defaultValue = null, validator = null) {
+        try {
+            const value = localStorage.getItem(key);
+            if (value === null) return defaultValue;
+            
+            if (validator && !validator(value)) {
+                console.warn(`Invalid value for ${key}, using default`);
+                return defaultValue;
+            }
+            
+            return value;
+        } catch (error) {
+            console.warn(`Error reading from localStorage for key ${key}:`, error);
+            return defaultValue;
+        }
+    }
+
+    safeSetToStorage(key, value) {
+        try {
+            localStorage.setItem(key, value);
+        } catch (error) {
+            console.warn(`Error writing to localStorage for key ${key}:`, error);
+        }
+    }
+
+    safeParseJSON(jsonString, defaultValue = null) {
+        try {
+            const parsed = JSON.parse(jsonString);
+            // Validate that favorites is an array with proper structure
+            if (Array.isArray(parsed)) {
+                return parsed.filter(item => 
+                    item && 
+                    typeof item.text === 'string' && 
+                    typeof item.reference === 'string' &&
+                    item.text.length < 1000 && // Reasonable length limits
+                    item.reference.length < 100
+                );
+            }
+            return defaultValue;
+        } catch (error) {
+            console.warn('Error parsing JSON:', error);
+            return defaultValue;
+        }
+    }
+
+    // Utility function to safely set icon content
+    setSecureIcon(element, iconName) {
+        // Clear existing content safely
+        while (element.firstChild) {
+            element.removeChild(element.firstChild);
+        }
+        
+        // Create icon element safely
+        const icon = document.createElement('i');
+        icon.setAttribute('data-feather', iconName);
+        element.appendChild(icon);
+        
+        // Replace with Feather icon
+        feather.replace({
+            'stroke-width': 2,
+            'width': 24,
+            'height': 24
+        });
+    }
+
     initializeState() {
-        // Load settings from localStorage
-        const savedInterval = localStorage.getItem('interval');
-        const savedTheme = localStorage.getItem('theme');
-        const savedShuffle = localStorage.getItem('shuffle');
-        const savedBackground = localStorage.getItem('background');
-        const savedFavorites = localStorage.getItem('favorites');
+        // Load settings from localStorage with validation
+        const intervalValidator = (value) => {
+            const num = parseInt(value);
+            return !isNaN(num) && num >= 5000 && num <= 60000;
+        };
+        
+        const booleanValidator = (value) => value === 'true' || value === 'false';
+        
+        const backgroundValidator = (value) => {
+            const validBackgrounds = [
+                'gradient', 'sunset', 'ocean', 'forest', 'mountain-dawn', 
+                'desert-dusk', 'northern-lights', 'spring-bloom', 'midnight-jazz', 
+                'golden-hour', 'midnight-frost', 'urban-shadow', 'pearl-dawn', 'cotton-cloud'
+            ];
+            return validBackgrounds.includes(value);
+        };
+
+        const savedInterval = this.safeGetFromStorage('interval', null, intervalValidator);
+        const savedTheme = this.safeGetFromStorage('theme', 'light', (value) => value === 'dark' || value === 'light');
+        const savedShuffle = this.safeGetFromStorage('shuffle', 'false', booleanValidator);
+        const savedBackground = this.safeGetFromStorage('background', 'gradient', backgroundValidator);
+        const savedFavoritesString = this.safeGetFromStorage('favorites', '[]');
+        const savedHasUsedSwipe = this.safeGetFromStorage('hasUsedSwipe', 'false', booleanValidator);
 
         if (savedInterval) {
             this.intervalTime = parseInt(savedInterval);
@@ -76,15 +171,13 @@ class BibleQuoteDisplay {
             this.shuffleQuotes();
         }
 
-        if (savedBackground) {
-            document.body.setAttribute('data-background', savedBackground);
-            this.backgroundSelect.value = savedBackground;
-        }
+        document.body.setAttribute('data-background', savedBackground);
+        this.backgroundSelect.value = savedBackground;
 
-        if (savedFavorites) {
-            this.favorites = JSON.parse(savedFavorites);
-            this.updateFavoritesList();
-        }
+        this.favorites = this.safeParseJSON(savedFavoritesString, []);
+        this.updateFavoritesList();
+        
+        this.hasUsedSwipe = savedHasUsedSwipe === 'true';
     }
 
     setupEventListeners() {
@@ -242,7 +335,7 @@ class BibleQuoteDisplay {
             const seconds = parseInt(e.target.value);
             this.intervalValue.textContent = seconds;
             this.intervalTime = seconds * 1000;
-            localStorage.setItem('interval', this.intervalTime);
+            this.safeSetToStorage('interval', this.intervalTime);
 
             if (this.isPlaying) {
                 this.restartSlideshow();
@@ -252,12 +345,12 @@ class BibleQuoteDisplay {
         this.themeToggle.addEventListener('change', () => {
             const theme = this.themeToggle.checked ? 'dark' : 'light';
             document.documentElement.setAttribute('data-theme', theme);
-            localStorage.setItem('theme', theme);
+            this.safeSetToStorage('theme', theme);
         });
 
         this.shuffleToggle.addEventListener('change', () => {
             this.isShuffled = this.shuffleToggle.checked;
-            localStorage.setItem('shuffle', this.isShuffled);
+            this.safeSetToStorage('shuffle', this.isShuffled);
 
             if (this.isShuffled) {
                 this.shuffleQuotes();
@@ -272,7 +365,7 @@ class BibleQuoteDisplay {
         this.backgroundSelect.addEventListener('change', () => {
             const background = this.backgroundSelect.value;
             document.body.setAttribute('data-background', background);
-            localStorage.setItem('background', background);
+            this.safeSetToStorage('background', background);
         });
 
         this.favoriteBtn.addEventListener('click', () => this.toggleFavorite());
@@ -295,7 +388,7 @@ class BibleQuoteDisplay {
             // Mark that user has used swipe functionality
             if (!this.hasUsedSwipe) {
                 this.hasUsedSwipe = true;
-                localStorage.setItem('hasUsedSwipe', 'true');
+                this.safeSetToStorage('hasUsedSwipe', 'true');
                 quoteCard.classList.add('swipe-used');
             }
             
@@ -327,28 +420,37 @@ class BibleQuoteDisplay {
     }
 
     updateFavoritesList() {
-        this.favoritesList.innerHTML = '';
+        // Clear existing content safely
+        while (this.favoritesList.firstChild) {
+            this.favoritesList.removeChild(this.favoritesList.firstChild);
+        }
+        
         if (this.favoritesCount) {
             this.favoritesCount.textContent = this.favorites.length;
         }
 
         if (this.favorites.length === 0) {
-            const emptyState = document.createElement('div');
-            emptyState.className = 'favorites-empty-state';
-            emptyState.innerHTML = `
-                <i data-feather="heart"></i>
-                <p>No favorites yet</p>
-                <span>Your favorite quotes will appear here</span>
-            `;
+            const emptyState = this.createSecureElement('div', '', 'favorites-empty-state');
+            
+            // Create icon element
+            const icon = document.createElement('i');
+            icon.setAttribute('data-feather', 'heart');
+            emptyState.appendChild(icon);
+            
+            // Create text elements
+            const title = this.createSecureElement('p', 'No favorites yet');
+            const subtitle = this.createSecureElement('span', 'Your favorite quotes will appear here');
+            
+            emptyState.appendChild(title);
+            emptyState.appendChild(subtitle);
             this.favoritesList.appendChild(emptyState);
+            
             feather.replace();
             return;
         }
 
         this.favorites.forEach((quote, index) => {
-            const item = document.createElement('div');
-            item.className = 'favorite-item';
-            item.innerHTML = quote.reference;
+            const item = this.createSecureElement('div', quote.reference, 'favorite-item');
             item.addEventListener('click', () => this.displayFavorite(index));
             this.favoritesList.appendChild(item);
         });
@@ -368,7 +470,7 @@ class BibleQuoteDisplay {
             this.favoriteBtn.classList.add('active');
         }
 
-        localStorage.setItem('favorites', JSON.stringify(this.favorites));
+        this.safeSetToStorage('favorites', JSON.stringify(this.favorites));
         this.updateFavoritesList();
     }
 
@@ -491,20 +593,8 @@ class BibleQuoteDisplay {
     updatePlayPauseButton() {
         if (!this.playPauseBtn) return;
 
-        // Clear existing content
-        this.playPauseBtn.innerHTML = '';
-
-        // Create new icon with correct attributes
-        const icon = document.createElement('i');
-        icon.setAttribute('data-feather', this.isPlaying ? 'pause' : 'play');
-        this.playPauseBtn.appendChild(icon);
-
-        // Replace with Feather icon
-        feather.replace({
-            'stroke-width': 2,
-            'width': 24,
-            'height': 24
-        });
+        // Use secure icon setting
+        this.setSecureIcon(this.playPauseBtn, this.isPlaying ? 'pause' : 'play');
     }
 
     toggleSettings() {
@@ -513,7 +603,7 @@ class BibleQuoteDisplay {
 
     clearFavorites() {
         this.favorites = [];
-        localStorage.setItem('favorites', JSON.stringify(this.favorites));
+        this.safeSetToStorage('favorites', JSON.stringify(this.favorites));
         this.updateFavoritesList();
         this.favoriteBtn.classList.remove('active');
     }
