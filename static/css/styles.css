@@ -441,16 +441,10 @@ body[data-background="cotton-cloud"] {
     height: 16px;
 }
 
-/* Show swipe hints on first load (mobile only) */
+/* Show swipe hints on first load (mobile only) - but hide them by default for cleaner experience */
 @media (max-width: 768px) {
-    .quote-card:hover .swipe-indicators,
-    .quote-card.show-hints .swipe-indicators {
-        opacity: 1;
-    }
-    
-    /* Auto-hide after first interaction */
-    .quote-card.swipe-used .swipe-indicators {
-        display: none;
+    .swipe-indicators {
+        display: none; /* Hide swipe hints completely on mobile for cleaner UI */
     }
 }
 

@@ -1,9 +1,30 @@
 class BibleQuoteDisplay {
     constructor() {
+        // Try multiple ways to access the quotes
+        let loadedQuotes = null;
+        
+        // Method 1: Direct global variable
+        if (typeof BIBLE_QUOTES !== 'undefined' && BIBLE_QUOTES.length > 0) {
+            loadedQuotes = BIBLE_QUOTES;
+        }
+        // Method 2: window.BIBLE_QUOTES
+        else if (typeof window.BIBLE_QUOTES !== 'undefined' && window.BIBLE_QUOTES.length > 0) {
+            loadedQuotes = window.BIBLE_QUOTES;
+        }
+        // Method 3: Check if it's defined but not assigned yet (timing issue)
+        else {
+            // Try again after a short delay
+            setTimeout(() => {
+                if (typeof BIBLE_QUOTES !== 'undefined' && BIBLE_QUOTES.length > 0) {
+                    this.quotes = BIBLE_QUOTES;
+                    this.shuffledQuotes = [...this.quotes];
+                    this.displayInitialQuote();
+                }
+            }, 100);
+        }
+        
         // Get quotes from the global BIBLE_QUOTES variable loaded from quotes.js
-        this.quotes = (window.BIBLE_QUOTES && window.BIBLE_QUOTES.length > 0) 
-            ? window.BIBLE_QUOTES 
-            : [{ text: "For God so loved the world, that he gave his only Son, that whoever believes in him should not perish but have eternal life.", reference: "John 3:16" }];
+        this.quotes = loadedQuotes || [{ text: "For God so loved the world, that he gave his only Son, that whoever believes in him should not perish but have eternal life.", reference: "John 3:16" }];
         
         this.shuffledQuotes = [...this.quotes];
         this.currentIndex = 0;
@@ -17,8 +38,8 @@ class BibleQuoteDisplay {
         this.touchStartY = 0;
         this.touchEndY = 0;
         this.isDragging = false;
-        this.swipeThreshold = 50;
-        this.swipeMinVelocity = 0.3;
+        this.swipeThreshold = 30; // Reduced from 50 for better responsiveness
+        this.swipeMinVelocity = 0.2; // Reduced from 0.3 for easier swipes
         this.hasUsedSwipe = localStorage.getItem('hasUsedSwipe') === 'true';
 
         // DOM Elements
@@ -184,6 +205,8 @@ class BibleQuoteDisplay {
         
         // Variables for better touch handling
         let touchStartTime = 0;
+        let tapCount = 0;
+        let tapTimer = null;
         
         quoteCard.addEventListener('touchstart', (e) => {
             // Store initial touch position and time
@@ -192,80 +215,8 @@ class BibleQuoteDisplay {
             touchStartTime = Date.now();
             this.isDragging = false;
             
-            // Add visual feedback
-            quoteCard.style.transition = 'none';
-        }, { passive: true });
-
-        quoteCard.addEventListener('touchmove', (e) => {
-            if (!this.touchStartX) return;
-            
-            const currentX = e.touches[0].clientX;
-            const currentY = e.touches[0].clientY;
-            const deltaX = currentX - this.touchStartX;
-            const deltaY = currentY - this.touchStartY;
-            
-            // Only handle horizontal swipes, allow vertical scrolling
-            if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 10) {
-                e.preventDefault(); // Prevent scrolling for horizontal swipes
-                this.isDragging = true;
-                
-                // Add visual feedback during swipe
-                const rotation = deltaX * 0.1;
-                const scale = 1 - Math.abs(deltaX) * 0.0005;
-                quoteCard.style.transform = `translateX(${deltaX * 0.3}px) rotate(${rotation}deg) scale(${scale})`;
-                quoteCard.style.opacity = 1 - Math.abs(deltaX) * 0.002;
-            }
-        }, { passive: false });
-
-        quoteCard.addEventListener('touchend', (e) => {
-            if (!this.touchStartX) return;
-            
-            this.touchEndX = e.changedTouches[0].clientX;
-            this.touchEndY = e.changedTouches[0].clientY;
-            
-            const touchEndTime = Date.now();
-            const touchDuration = touchEndTime - touchStartTime;
-            
-            // Reset visual feedback
-            quoteCard.style.transition = 'transform 0.3s ease, opacity 0.3s ease';
-            quoteCard.style.transform = '';
-            quoteCard.style.opacity = '';
-            
-            // Handle swipe if dragging occurred
-            if (this.isDragging) {
-                this.handleSwipe(touchDuration);
-            }
-            
-            // Reset touch values
-            this.touchStartX = 0;
-            this.touchStartY = 0;
-            this.touchEndX = 0;
-            this.touchEndY = 0;
-            this.isDragging = false;
-        }, { passive: true });
-
-        // Handle touch cancel (when user drags outside the element)
-        quoteCard.addEventListener('touchcancel', (e) => {
-            // Reset visual feedback
-            quoteCard.style.transition = 'transform 0.3s ease, opacity 0.3s ease';
-            quoteCard.style.transform = '';
-            quoteCard.style.opacity = '';
-            
-            // Reset touch values
-            this.touchStartX = 0;
-            this.touchStartY = 0;
-            this.touchEndX = 0;
-            this.touchEndY = 0;
-            this.isDragging = false;
-        }, { passive: true });
-
-        // Enhanced double tap detection for mobile
-        let tapCount = 0;
-        let tapTimer = null;
-        
-        quoteCard.addEventListener('touchstart', (e) => {
-            // Only handle double-tap if not currently dragging/swiping
-            if (e.touches.length === 1 && !this.isDragging) {
+            // Handle double-tap detection for favorites
+            if (e.touches.length === 1) {
                 tapCount++;
                 
                 if (tapCount === 1) {
@@ -290,8 +241,68 @@ class BibleQuoteDisplay {
                             }, 150);
                         }
                     }, 10);
+                    return;
                 }
             }
+        }, { passive: false });
+
+        quoteCard.addEventListener('touchmove', (e) => {
+            if (!this.touchStartX) return;
+            
+            const currentX = e.touches[0].clientX;
+            const currentY = e.touches[0].clientY;
+            const deltaX = currentX - this.touchStartX;
+            const deltaY = currentY - this.touchStartY;
+            
+            // Only handle horizontal swipes, allow vertical scrolling
+            if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 15) {
+                e.preventDefault(); // Prevent scrolling for horizontal swipes
+                this.isDragging = true;
+                
+                // Minimal visual feedback - just a subtle hint
+                if (Math.abs(deltaX) > 30) {
+                    const opacity = Math.max(0.7, 1 - Math.abs(deltaX) * 0.001);
+                    quoteCard.style.opacity = opacity;
+                }
+            }
+        }, { passive: false });
+
+        quoteCard.addEventListener('touchend', (e) => {
+            if (!this.touchStartX) return;
+            
+            this.touchEndX = e.changedTouches[0].clientX;
+            this.touchEndY = e.changedTouches[0].clientY;
+            
+            const touchEndTime = Date.now();
+            const touchDuration = touchEndTime - touchStartTime;
+            
+            // Reset visual feedback quickly
+            quoteCard.style.opacity = '';
+            
+            // Handle swipe if dragging occurred
+            if (this.isDragging) {
+                this.handleSwipe(touchDuration);
+            }
+            
+            // Reset touch values
+            this.touchStartX = 0;
+            this.touchStartY = 0;
+            this.touchEndX = 0;
+            this.touchEndY = 0;
+            this.isDragging = false;
+        }, { passive: true });
+
+        // Handle touch cancel (when user drags outside the element)
+        quoteCard.addEventListener('touchcancel', (e) => {
+            // Reset visual feedback quickly
+            quoteCard.style.opacity = '';
+            
+            // Reset touch values
+            this.touchStartX = 0;
+            this.touchStartY = 0;
+            this.touchEndX = 0;
+            this.touchEndY = 0;
+            this.isDragging = false;
         }, { passive: true });
 
         // Fallback click handler for desktop
@@ -584,16 +595,20 @@ class BibleQuoteDisplay {
             clearInterval(this.interval);
         }
 
+        if (!this.isPlaying) return; // Don't start if paused
+
         let timeLeft = this.intervalTime / 1000;
         this.updateCountdown(timeLeft);
 
         this.interval = setInterval(() => {
-            timeLeft -= 0.1;
-            if (timeLeft <= 0) {
-                timeLeft = this.intervalTime / 1000;
-                this.nextQuote();
+            if (this.isPlaying) { // Only proceed if still playing
+                timeLeft -= 0.1;
+                if (timeLeft <= 0) {
+                    timeLeft = this.intervalTime / 1000;
+                    this.nextQuote();
+                }
+                this.updateCountdown(timeLeft);
             }
-            this.updateCountdown(timeLeft);
         }, 100);
     }
 
