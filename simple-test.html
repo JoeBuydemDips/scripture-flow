@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Test</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            padding: 20px; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        .quote-text { 
+            font-size: 2rem; 
+            margin-bottom: 1rem; 
+            text-align: center;
+        }
+        .quote-reference { 
+            font-size: 1.2rem; 
+            font-style: italic; 
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="quote-text">Loading...</div>
+    <div class="quote-reference"></div>
+    
+    <script src="quotes.js"></script>
+    <script>
+        console.log('Simple test starting...');
+        console.log('BIBLE_QUOTES available:', typeof BIBLE_QUOTES !== 'undefined');
+        
+        if (typeof BIBLE_QUOTES !== 'undefined' && BIBLE_QUOTES.length > 0) {
+            const quote = BIBLE_QUOTES[0];
+            document.querySelector('.quote-text').textContent = quote.text;
+            document.querySelector('.quote-reference').textContent = quote.reference;
+            console.log('Quote displayed:', quote.text.substring(0, 50) + '...');
+        } else {
+            document.querySelector('.quote-text').textContent = "Error: No quotes available";
+            document.querySelector('.quote-reference').textContent = "";
+        }
+    </script>
+</body>
+</html>

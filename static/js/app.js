@@ -40,25 +40,9 @@ class BibleQuoteDisplay {
         this.initializeState();
         this.lastTap = 0; // For double-tap detection
 
-        // Initialize Feather icons first
-        if (typeof feather === 'undefined') {
-            console.error("Feather icons script did not load.");
-            // Optionally, hide elements that rely on Feather icons
-            document.querySelectorAll('.control-btn, .favorite-btn').forEach(btn => btn.style.display = 'none');
-            // Display an error message to the user
-            this.quoteText.textContent = "Error: Icons could not be loaded. Please check your internet connection.";
-            this.quoteReference.textContent = "";
-            return; // Stop initialization
-        }
-        feather.replace({
-            'stroke-width': 2,
-            'width': 24,
-            'height': 24
-        });
-
         this.setupEventListeners();
         this.startSlideshow();
-        this.displayQuote();
+        this.displayInitialQuote(); // Use immediate display for first quote
         this.updatePlayPauseButton();
         this.showSwipeHintsIfNeeded();
     }
@@ -123,22 +107,17 @@ class BibleQuoteDisplay {
 
     // Utility function to safely set icon content
     setSecureIcon(element, iconName) {
-        // Clear existing content safely
-        while (element.firstChild) {
-            element.removeChild(element.firstChild);
-        }
-        
-        // Create icon element safely
-        const icon = document.createElement('i');
-        icon.setAttribute('data-feather', iconName);
-        element.appendChild(icon);
-        
-        // Replace with Feather icon
-        feather.replace({
-            'stroke-width': 2,
-            'width': 24,
-            'height': 24
-        });
+        const icons = {
+            play: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>',
+            pause: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>',
+            heart: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>',
+            settings: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>',
+            x: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>',
+            'trash-2': '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>',
+            'chevron-left': '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>',
+            'chevron-right': '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>'
+        };
+        element.innerHTML = icons[iconName] || '';
     }
 
     initializeState() {
@@ -397,6 +376,7 @@ class BibleQuoteDisplay {
         const hasMinVelocity = velocity > this.swipeMinVelocity;
         
         if (isHorizontalSwipe && (exceedsThreshold || hasMinVelocity)) {
+            const quoteCard = document.querySelector('.quote-card');
             // Mark that user has used swipe functionality
             if (!this.hasUsedSwipe) {
                 this.hasUsedSwipe = true;
@@ -405,7 +385,6 @@ class BibleQuoteDisplay {
             }
             
             // Add swipe animation class
-            const quoteCard = document.querySelector('.quote-card');
             
             if (deltaX > 0) {
                 // Swipe right - previous quote
@@ -445,8 +424,8 @@ class BibleQuoteDisplay {
             const emptyState = this.createSecureElement('div', '', 'favorites-empty-state');
             
             // Create icon element
-            const icon = document.createElement('i');
-            icon.setAttribute('data-feather', 'heart');
+            const icon = document.createElement('div');
+            icon.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>';
             emptyState.appendChild(icon);
             
             // Create text elements
@@ -457,7 +436,6 @@ class BibleQuoteDisplay {
             emptyState.appendChild(subtitle);
             this.favoritesList.appendChild(emptyState);
             
-            feather.replace();
             return;
         }
 
@@ -513,12 +491,43 @@ class BibleQuoteDisplay {
         }
     }
 
-    displayQuote() {
+    displayInitialQuote() {
         if (!this.shuffledQuotes || this.shuffledQuotes.length === 0) {
-            this.quoteText.textContent = "No quotes available. Please check the quotes data source.";
-            this.quoteReference.textContent = "";
+            if (this.quoteText) this.quoteText.textContent = "No quotes available. Please check the quotes data source.";
+            if (this.quoteReference) this.quoteReference.textContent = "";
             return;
         }
+        
+        if (!this.quoteText || !this.quoteReference) {
+            console.error('Quote display elements not found');
+            return;
+        }
+        
+        const quote = this.shuffledQuotes[this.currentIndex];
+        
+        // Set content immediately without fade effect for initial load
+        this.quoteText.textContent = quote.text;
+        this.quoteReference.textContent = quote.reference;
+        this.quoteText.style.opacity = '1';
+        this.quoteReference.style.opacity = '1';
+        
+        if (this.favoriteBtn) {
+            this.favoriteBtn.classList.toggle('active', this.isQuoteFavorited(quote));
+        }
+    }
+
+    displayQuote() {
+        if (!this.shuffledQuotes || this.shuffledQuotes.length === 0) {
+            if (this.quoteText) this.quoteText.textContent = "No quotes available. Please check the quotes data source.";
+            if (this.quoteReference) this.quoteReference.textContent = "";
+            return;
+        }
+        
+        if (!this.quoteText || !this.quoteReference) {
+            console.error('Quote display elements not found');
+            return;
+        }
+        
         const quote = this.shuffledQuotes[this.currentIndex];
 
         // Fade out current quote
@@ -529,7 +538,9 @@ class BibleQuoteDisplay {
         setTimeout(() => {
             this.quoteText.textContent = quote.text;
             this.quoteReference.textContent = quote.reference;
-            this.favoriteBtn.classList.toggle('active', this.isQuoteFavorited(quote));
+            if (this.favoriteBtn) {
+                this.favoriteBtn.classList.toggle('active', this.isQuoteFavorited(quote));
+            }
 
             // Fade in new quote
             this.quoteText.style.opacity = '1';
@@ -651,15 +662,5 @@ class BibleQuoteDisplay {
 
 // Initialize the application when the DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
-    // Initialize Feather icons with specific settings
-    if (typeof feather !== 'undefined') {
-        feather.replace({
-            'stroke-width': 2,
-            'width': 24,
-            'height': 24,
-            'color': 'currentColor'
-        });
-    }
-    // Then create the Bible quote display instance
     const app = new BibleQuoteDisplay();
 });

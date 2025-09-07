@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Debug Test</title>
+</head>
+<body>
+    <h1>Debug Test</h1>
+    <div id="output"></div>
+    <script src="quotes.js"></script>
+    <script>
+        const output = document.getElementById('output');
+        
+        // Test 1: Check if quotes loaded
+        output.innerHTML += '<p>Quotes loaded: ' + (typeof BIBLE_QUOTES !== 'undefined') + '</p>';
+        output.innerHTML += '<p>Quotes count: ' + (typeof BIBLE_QUOTES !== 'undefined' ? BIBLE_QUOTES.length : 0) + '</p>';
+        
+        // Test 2: Check if DOM elements exist in main page
+        setTimeout(() => {
+            const quoteText = document.querySelector('.quote-text');
+            const quoteReference = document.querySelector('.quote-reference');
+            const playPauseBtn = document.getElementById('playPauseBtn');
+            
+            output.innerHTML += '<p>Quote text element exists: ' + (quoteText !== null) + '</p>';
+            output.innerHTML += '<p>Quote reference element exists: ' + (quoteReference !== null) + '</p>';
+            output.innerHTML += '<p>Play/pause button exists: ' + (playPauseBtn !== null) + '</p>';
+        }, 100);
+    </script>
+</body>
+</html>
